@@ -1,0 +1,6 @@
+unstructured
+python-pptx
+googletrans==3.1.0a0
+streamlit==1.24.0
+streamlit_extras
+PyPDF2
