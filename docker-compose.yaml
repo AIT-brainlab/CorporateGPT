@@ -1,14 +1,16 @@
 version: '3.9'
 services:
   web:
-    image: akraradets/corporategpt:v0.0.1
+    image: akraradets/corporategpt:v0.0.2
     build:
       context: .
       dockerfile: .Dockerfile
     volumes:
       - ./code:/root/code
       - vscode-server:/root/.vscode-server
-    command: streamlit run Main.py --server.port=80 --server.address=0.0.0.0
+
+    command: tail -f /dev/null
+    # command: streamlit run Main.py --server.port=80 --server.address=0.0.0.0
     ports:
       - 80:80
     deploy:

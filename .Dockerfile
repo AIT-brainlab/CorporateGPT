@@ -22,19 +22,38 @@ ENV LANGUAGE en_US:en
 
 RUN apt install -y python3 python3-pip
 
+RUN pip3 install numpy
+RUN pip3 install pandas
+RUN pip3 install matplotlib
+RUN pip3 install seaborn
+RUN pip3 install scikit-learn
+
+RUN pip3 install langchain==0.0.162
+RUN pip3 install beautifulsoup4
+RUN pip3 install InstructorEmbedding
+RUN pip3 install torch
+RUN pip3 install sentence_transformers
+RUN pip3 install python-dotenv
+RUN pip3 install transformers
+RUN pip3 install chromadb
+RUN pip3 install fschat
+RUN pip3 install accelerate
+RUN pip3 install bitsandbytes
+RUN pip3 install openai
+RUN pip3 install plotly
+RUN pip3 install streamlit
+RUN pip3 install faiss-cpu
+RUN pip3 install gspread
+RUN pip3 install altair 
+RUN pip3 install streamlit-chat
+RUN pip3 install protobuf==3.20.1
+
 RUN pip3 install unstructured
 RUN pip3 install python-pptx
 RUN pip3 install googletrans==3.1.0a0
 RUN pip3 install streamlit==1.24.0
 RUN pip3 install streamlit_extras
 RUN pip3 install PyPDF2
-RUN pip3 install torch
-RUN pip3 install streamlit-chat
-RUN pip3 install gspread
-RUN pip3 install langchain
-RUN pip3 install InstructorEmbedding
-RUN pip3 install sentence_transformers
-RUN pip3 install faiss-cpu
 
 # Clean apt 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*

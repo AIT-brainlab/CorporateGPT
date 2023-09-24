@@ -97,6 +97,7 @@ if "chat_history" not in st.session_state: #this one is to pass previous message
 
 
 llm_model =  st.session_state['model']
+print(llm_model)
 vector_database =  st.session_state['faiss_db']
 conversational_qa_memory_retriever, question_generator = load_conversational_qa_memory_retriever()
 translator = Translator()

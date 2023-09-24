@@ -3,6 +3,8 @@ import torch
 from langchain import HuggingFacePipeline
 from langchain.chains import RetrievalQA
 from streamlit_extras.row import row
+from transformers import BitsAndBytesConfig
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline, T5Tokenizer, AutoModel, T5ForConditionalGeneration
 
 if 'model' not in st.session_state:
     st.session_state['model'] = 0
@@ -13,21 +15,41 @@ if 'temperature' not in st.session_state:
 if 'repetition_penalty' not in st.session_state:
     st.session_state['repetition_penalty'] = 0
 
+bitsandbyte_config = BitsAndBytesConfig(
+                        load_in_4bit=True,
+                        bnb_4bit_quant_type="nf4",
+                        bnb_4bit_compute_dtype=torch.float16)
+
+@st.cache_resource
 def load_llm_model(max_length, temperature,  repetition_penalty):
+    #this one is for running with GPU
+    model = T5ForConditionalGeneration.from_pretrained('lmsys/fastchat-t5-3b-v1.0',
+                                                       quantization_config = bitsandbyte_config,
+                                                       device_map= 'auto')
+    tokenizer =  AutoTokenizer.from_pretrained('lmsys/fastchat-t5-3b-v1.0')
+    pipe = pipeline(
+        task= 'text2text-generation', model=model, tokenizer=tokenizer, max_new_tokens=256, model_kwargs={"temperature":0,
+                                                                                                         "repetition_penalty": 1.5}
+    )
+    llm = HuggingFacePipeline(pipeline=pipe)
+    
     # llm = HuggingFacePipeline.from_model_id(model_id= 'lmsys/fastchat-t5-3b-v1.0', 
     #                                         task= 'text2text-generation',
-    #                                         model_kwargs={ "device_map": "auto",
-    #                                                     "load_in_8bit": True,"max_length": 256, "temperature": 0,
-    #                                                     "repetition_penalty": 1.5})
+    #                                         model_kwargs={ 
+    #                                             # "device_map": "auto",
+    #                                                     "max_length": 256, "temperature": 0,
+    #                                                     "repetition_penalty": 1.5,
+    #                                                      "quantization_config": bitsandbyte_config}) #add this quantization config
     
     
-    llm = HuggingFacePipeline.from_model_id(model_id= 'lmsys/fastchat-t5-3b-v1.0', 
-                                        task= 'text2text-generation',
+    # llm = HuggingFacePipeline.from_model_id(model_id= 'lmsys/fastchat-t5-3b-v1.0', 
+    #                                     task= 'text2text-generation',
                                         
-                                        model_kwargs={ "max_length": max_length, "temperature": temperature,
-                                                      "torch_dtype":torch.float32,
-                                                    "repetition_penalty": repetition_penalty})
-    return llm  
+    #                                     model_kwargs={ "max_length": 256, "temperature": 0,
+    #                                                   "torch_dtype":torch.float32,
+    #                                                 "repetition_penalty": 1.3})
+    return llm
+
 
 
 
@@ -64,7 +86,7 @@ if load_model_button:
     st.session_state['temperature'] = temperature
     st.session_state['repetition_penalty'] = repetition_penalty
     
-    # st.session_state['model'] = load_llm_model(max_length, temperature, repetition_penalty)
+    st.session_state['model'] = load_llm_model(max_length, temperature, repetition_penalty)
     
     
     st.write("⚠️ Please expect to wait **1 - 2 minutes **  for the application to download the 3-billion-parameter LLM")
